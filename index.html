@@ -1,14 +1,744 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EleitorON</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EleitorON</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{
+      --bg:#050505;
+      --card:#0B0B0B;
+      --field:#141414;
+      --green:#6CFF3B;
+      --glow:#39FF14;
+      --muted:#A0A0A0;
+      --border:#242424;
+      --red:#ff5b5b;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:Arial,Helvetica,sans-serif;
+      background:radial-gradient(circle at top,#141414 0%,#050505 42%,#000 100%);
+      color:#fff;
+    }
+
+    .copyright{
+      text-align:center;
+      color:#777;
+      font-size:12px;
+      padding:14px 10px 0;
+    }
+
+    .layout{
+      max-width:1500px;
+      margin:auto;
+      padding:22px;
+      display:grid;
+      grid-template-columns:260px 1fr 340px;
+      gap:18px;
+    }
+
+    .sidebar,.hero,.card,.rightbox,.option,.form{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:22px;
+      box-shadow:0 20px 50px rgba(0,0,0,.55);
+    }
+
+    .sidebar{
+      padding:22px;
+      height:fit-content;
+    }
+
+    .logo{
+      font-size:34px;
+      font-weight:900;
+      letter-spacing:-1px;
+    }
+
+    .logo span{
+      color:var(--green);
+      text-shadow:0 0 16px var(--glow);
+    }
+
+    .tag{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:8px;
+      line-height:1.4;
+    }
+
+    .nav{
+      display:grid;
+      gap:10px;
+      margin-top:30px;
+    }
+
+    .nav div{
+      padding:13px;
+      border:1px solid #1d1d1d;
+      border-radius:14px;
+      background:#090909;
+    }
+
+    .nav div.active{
+      color:var(--green);
+      background:#101810;
+      border-color:#293c25;
+    }
+
+    .mini{
+      margin-top:30px;
+      border:1px solid var(--border);
+      background:#050505;
+      border-radius:18px;
+      padding:18px;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.45;
+    }
+
+    .main{
+      display:grid;
+      gap:18px;
+    }
+
+    .hero{
+      padding:34px;
+      position:relative;
+      overflow:hidden;
+      min-height:275px;
+    }
+
+    .hero:after{
+      content:"ON";
+      position:absolute;
+      right:28px;
+      top:5px;
+      font-size:180px;
+      font-weight:900;
+      color:rgba(108,255,59,.08);
+    }
+
+    .badge{
+      display:inline-block;
+      color:var(--green);
+      border:1px solid #333;
+      background:#000;
+      padding:9px 14px;
+      border-radius:999px;
+      font-size:13px;
+      margin-bottom:18px;
+    }
+
+    h1{
+      font-size:54px;
+      line-height:1;
+      margin:0;
+      letter-spacing:-2px;
+    }
+
+    h1 span{
+      color:var(--green);
+      text-shadow:0 0 24px var(--glow);
+    }
+
+    .hero p{
+      color:#ddd;
+      max-width:650px;
+      line-height:1.5;
+    }
+
+    .actions{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:22px;
+    }
+
+    button{
+      border:0;
+      border-radius:14px;
+      padding:14px 18px;
+      font-weight:900;
+      cursor:pointer;
+      background:var(--green);
+      color:#000;
+      box-shadow:0 0 18px rgba(57,255,20,.24);
+    }
+
+    button.secondary{
+      background:#000;
+      color:#fff;
+      border:1px solid var(--green);
+      box-shadow:none;
+    }
+
+    button:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+    }
+
+    .features,.options,.formgrid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:14px;
+    }
+
+    .card,.option{
+      padding:20px;
+    }
+
+    .card p,.option p,.small{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.4;
+    }
+
+    .icon{
+      font-size:28px;
+      color:var(--green);
+    }
+
+    .option{
+      cursor:pointer;
+      transition:.2s;
+    }
+
+    .option:hover{
+      border-color:var(--green);
+      transform:translateY(-2px);
+    }
+
+    .form{
+      padding:24px;
+    }
+
+    .hidden{
+      display:none;
+    }
+
+    .row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .formgrid{
+      grid-template-columns:repeat(2,1fr);
+      margin-top:18px;
+    }
+
+    input,textarea,select{
+      width:100%;
+      padding:13px;
+      border-radius:12px;
+      border:1px solid #333;
+      background:var(--field);
+      color:#fff;
+      font-size:15px;
+    }
+
+    textarea{
+      min-height:115px;
+      resize:vertical;
+      margin-top:13px;
+    }
+
+    .upload{
+      margin-top:14px;
+      padding:22px;
+      border:1px dashed #444;
+      border-radius:18px;
+      background:#000;
+      text-align:center;
+    }
+
+    .full{
+      width:100%;
+      margin-top:14px;
+      padding:17px;
+    }
+
+    .rightbox{
+      padding:22px;
+      margin-bottom:18px;
+    }
+
+    .rightbox h2{
+      color:var(--green);
+      margin-top:0;
+      text-shadow:0 0 12px rgba(57,255,20,.25);
+    }
+
+    .message{
+      background:#050505;
+      border:1px solid #333;
+      border-radius:18px;
+      padding:16px;
+      color:#ddd;
+      font-size:14px;
+      line-height:1.5;
+    }
+
+    .benefit{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      margin:15px 0;
+      color:#ddd;
+      font-size:14px;
+    }
+
+    .dot{
+      width:12px;
+      height:12px;
+      border-radius:50%;
+      background:var(--green);
+      box-shadow:0 0 14px var(--glow);
+      flex:none;
+    }
+
+    .files{
+      text-align:left;
+      color:var(--muted);
+      font-size:13px;
+      margin-top:12px;
+    }
+
+    .ok{
+      color:var(--green);
+      font-weight:700;
+    }
+
+    .err{
+      color:var(--red);
+      font-weight:700;
+    }
+
+    label{
+      color:#ddd;
+      font-size:13px;
+      line-height:1.4;
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      margin-top:14px;
+    }
+
+    label input{
+      width:auto;
+      margin-top:3px;
+    }
+
+    @media(max-width:1100px){
+      .layout{grid-template-columns:1fr}
+      .features,.options,.formgrid{grid-template-columns:1fr}
+      h1{font-size:40px}
+      .hero:after{display:none}
+    }
+  </style>
 </head>
-<body style="background:#050505;color:white;font-family:Arial;padding:40px;">
-<h1 style="color:#6CFF3B;">ELEITORON</h1>
-<p>Desenvolvido por Francis Jambeiro v1.0</p>
-<p>contato@francisjambeiro.com</p>
-<p>Direitos Autorais Reservados</p>
+<body>
+  <div class="copyright">
+    Desenvolvido por Francis Jambeiro v1.0 • contato@francisjambeiro.com • Direitos Autorais Reservados
+  </div>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="logo">ELEITOR<span>ON</span></div>
+      <div class="tag">A POPULAÇÃO ONLINE.<br>A POLÍTICA EM TEMPO REAL.</div>
+
+      <div class="nav">
+        <div>▦ Dashboard</div>
+        <div>☑ Demandas</div>
+        <div class="active">▣ Banco de Dados</div>
+        <div>◎ Mapa de Calor</div>
+        <div>▥ Relatórios</div>
+        <div>☏ Comunicações</div>
+      </div>
+
+      <div class="mini">
+        <b>Banco Supabase</b><br><br>
+        Cada envio é salvo para análise territorial, histórico político, relatórios e mapas de calor.
+      </div>
+    </aside>
+
+    <main class="main">
+      <section class="hero">
+        <div class="badge">● central de inteligência popular</div>
+        <h1>A CIDADE FALA.<br>O SISTEMA <span>REGISTRA.</span></h1>
+        <p>Cada manifestação vira dado: bairro, tema, urgência, apoiador, voluntário, prioridade territorial e localização geográfica autorizada pelo usuário.</p>
+        <div class="actions">
+          <button onclick="selecionarTipo('Reclamação do bairro')">FAZER UMA DEMANDA</button>
+          <button class="secondary" onclick="compartilharLista()">LISTA DE TRANSMISSÃO</button>
+        </div>
+      </section>
+
+      <section class="features">
+        <div class="card">
+          <div class="icon">👤</div>
+          <h3>Cadastro de Eleitores</h3>
+          <p>Nome, bairro, cidade, contato e consentimento.</p>
+        </div>
+        <div class="card">
+          <div class="icon">🗄️</div>
+          <h3>Demandas Salvas</h3>
+          <p>Tipo, tema, urgência, relato, sugestão e status.</p>
+        </div>
+        <div class="card">
+          <div class="icon">📍</div>
+          <h3>Geolocalização</h3>
+          <p>Latitude e longitude para relatórios territoriais.</p>
+        </div>
+      </section>
+
+      <section id="opcoes" class="options">
+        <div class="option" onclick="selecionarTipo('Denúncia')">
+          <div class="icon">⚠</div>
+          <h3>Denúncia</h3>
+          <p>Irregularidade, abuso, abandono ou descaso público.</p>
+        </div>
+        <div class="option" onclick="selecionarTipo('Reclamação do bairro')">
+          <div class="icon">📍</div>
+          <h3>Reclamação do bairro</h3>
+          <p>Rua, iluminação, saúde, transporte, segurança ou infraestrutura.</p>
+        </div>
+        <div class="option" onclick="selecionarTipo('Sugestão')">
+          <div class="icon">💡</div>
+          <h3>Sugestão</h3>
+          <p>Ideia, proposta ou solução para melhorar a cidade.</p>
+        </div>
+        <div class="option" onclick="selecionarTipo('Apoio político')">
+          <div class="icon">🤝</div>
+          <h3>Apoio político</h3>
+          <p>Declare apoio, indique pessoas ou manifeste adesão.</p>
+        </div>
+        <div class="option" onclick="selecionarTipo('Voluntariado')">
+          <div class="icon">👥</div>
+          <h3>Voluntariado</h3>
+          <p>Ajude na mobilização, comunicação ou organização local.</p>
+        </div>
+      </section>
+
+      <section id="formulario" class="form hidden">
+        <div class="row">
+          <div>
+            <div class="small">Tipo de manifestação</div>
+            <h2 id="tipoEscolhido" style="color:var(--green)"></h2>
+          </div>
+          <button class="secondary" onclick="trocarTipo()">Trocar tipo</button>
+        </div>
+
+        <div class="formgrid">
+          <input id="nome" placeholder="Nome completo">
+          <input id="telefone" placeholder="WhatsApp">
+          <input id="bairro" placeholder="Bairro">
+          <input id="cidade" placeholder="Cidade">
+          <input id="profissao" placeholder="Profissão ou ocupação">
+          <select id="tema">
+            <option value="">Tema principal</option>
+            <option>Saúde</option>
+            <option>Educação</option>
+            <option>Segurança</option>
+            <option>Transporte</option>
+            <option>Infraestrutura</option>
+            <option>Iluminação pública</option>
+            <option>Emprego e renda</option>
+            <option>Funcionalismo público</option>
+            <option>Outro</option>
+          </select>
+        </div>
+
+        <br>
+
+        <select id="urgencia">
+          <option value="">Grau de urgência</option>
+          <option>Baixa</option>
+          <option>Média</option>
+          <option>Alta</option>
+          <option>Urgente</option>
+        </select>
+
+        <textarea id="relato" placeholder="Descreva o problema, denúncia, reclamação ou situação do bairro."></textarea>
+        <textarea id="sugestao" placeholder="Qual solução você sugere?"></textarea>
+
+        <div class="formgrid">
+          <select id="apoio">
+            <option value="">Deseja apoiar o projeto?</option>
+            <option>Sim</option>
+            <option>Talvez</option>
+            <option>Não</option>
+          </select>
+
+          <select id="voluntario">
+            <option value="">Deseja ser voluntário?</option>
+            <option>Sim</option>
+            <option>Talvez</option>
+            <option>Não</option>
+          </select>
+        </div>
+
+        <div class="upload">
+          <p>Envie fotos, vídeos, prints ou documentos que comprovem a situação.</p>
+          <input id="arquivos" type="file" multiple onchange="listarArquivos()">
+          <div id="listaArquivos" class="files"></div>
+        </div>
+
+        <label>
+          <input id="consentimento" type="checkbox">
+          Autorizo o armazenamento dos dados enviados para fins de organização, análise territorial, retorno de contato e gestão das manifestações populares.
+        </label>
+
+        <label>
+          <input id="consentimentoLocalizacao" type="checkbox">
+          Autorizo a captura da minha localização aproximada para fins de análise territorial e geração de relatórios por região.
+        </label>
+
+        <p id="status" class="small"></p>
+
+        <button id="btnEnviar" class="full" onclick="salvarEEnviar()">SALVAR NO BANCO E ENVIAR PELO WHATSAPP</button>
+      </section>
+    </main>
+
+    <aside>
+      <section class="rightbox">
+        <h2>BANCO DE DADOS</h2>
+        <div class="message">
+          Sistema conectado ao Supabase.<br><br>
+          Tabelas utilizadas:<br><br>
+          <b style="color:var(--green)">eleitores</b><br>
+          <b style="color:var(--green)">demandas</b><br>
+          <b style="color:var(--green)">arquivos</b><br>
+          <b style="color:var(--green)">localizacao_usuarios</b>
+        </div>
+      </section>
+
+      <section class="rightbox">
+        <h2>BENEFÍCIOS</h2>
+        <div class="benefit"><div class="dot"></div>Ouça mais pessoas</div>
+        <div class="benefit"><div class="dot"></div>Entenda o território</div>
+        <div class="benefit"><div class="dot"></div>Decida com inteligência</div>
+        <div class="benefit"><div class="dot"></div>Gere mapas e relatórios</div>
+        <div class="benefit"><div class="dot"></div>Transforme dados em ação</div>
+      </section>
+
+      <section class="rightbox">
+        <h2>LISTA DE TRANSMISSÃO</h2>
+        <p class="small">Gere a mensagem com o link do formulário para enviar no WhatsApp.</p>
+        <button class="full" onclick="compartilharLista()">GERAR MENSAGEM</button>
+      </section>
+    </aside>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://casvnntqkozninmuazup.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhc3ZubnRxa296bmlubXVhenVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4ODk1NjYsImV4cCI6MjA5NTQ2NTU2Nn0.GdAdboPwO5fe6mU9gagWGSmrTt_ACB8HK0QPi6VnhLg";
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const numeroWhatsApp = "5571983406868";
+    const linkSistema = window.location.href;
+    let tipoSelecionado = "";
+    let arquivos = [];
+
+    function selecionarTipo(tipo){
+      tipoSelecionado = tipo;
+      document.getElementById("tipoEscolhido").innerText = tipo;
+      document.getElementById("opcoes").classList.add("hidden");
+      document.getElementById("formulario").classList.remove("hidden");
+      window.scrollTo({top:0,behavior:"smooth"});
+    }
+
+    function trocarTipo(){
+      tipoSelecionado = "";
+      document.getElementById("formulario").classList.add("hidden");
+      document.getElementById("opcoes").classList.remove("hidden");
+    }
+
+    function listarArquivos(){
+      const input = document.getElementById("arquivos");
+      arquivos = Array.from(input.files).map(file => file.name);
+      document.getElementById("listaArquivos").innerHTML = arquivos.length ? arquivos.map(a => "📎 " + a).join("<br>") : "";
+    }
+
+    function valor(id){
+      return document.getElementById(id).value || "";
+    }
+
+    function setStatus(texto,tipo="ok"){
+      const el = document.getElementById("status");
+      el.className = tipo === "ok" ? "ok" : "err";
+      el.innerText = texto;
+    }
+
+    function compartilharLista(){
+      const mensagem =
+`ELEITORON
+
+A cidade fala. O sistema escuta.
+
+Estamos ouvindo a população para construir propostas reais.
+
+Acesse o formulário e envie sua denúncia, reclamação, sugestão ou pedido:
+
+${linkSistema}
+
+Sua participação ajuda a mostrar os problemas que precisam ser enfrentados.
+
+Para não receber novas mensagens, responda SAIR.`;
+
+      window.open("https://wa.me/?text=" + encodeURIComponent(mensagem), "_blank");
+    }
+
+    async function capturarLocalizacao(eleitorId){
+      const permitido = document.getElementById("consentimentoLocalizacao").checked;
+
+      if(!permitido){
+        return;
+      }
+
+      if(!navigator.geolocation){
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        async (posicao) => {
+          try{
+            await db.from("localizacao_usuarios").insert([{
+              eleitor_id: eleitorId,
+              latitude: posicao.coords.latitude,
+              longitude: posicao.coords.longitude,
+              navegador: navigator.userAgent,
+              dispositivo: navigator.platform,
+              cidade: valor("cidade"),
+              bairro: valor("bairro")
+            }]);
+          }catch(e){
+            console.log("Erro ao salvar localização:", e.message);
+          }
+        },
+        (erro) => {
+          console.log("Localização não autorizada:", erro.message);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        }
+      );
+    }
+
+    async function salvarNoBanco(){
+      const consentimento = document.getElementById("consentimento").checked;
+
+      if(!consentimento){
+        setStatus("É necessário autorizar o armazenamento dos dados para enviar.","err");
+        return null;
+      }
+
+      const {data:eleitor,error:eleitorError} = await db.from("eleitores").insert([{
+        nome: valor("nome"),
+        telefone: valor("telefone"),
+        bairro: valor("bairro"),
+        cidade: valor("cidade"),
+        profissao: valor("profissao"),
+        consentimento_lgpd: consentimento
+      }]).select().single();
+
+      if(eleitorError){
+        setStatus("Erro ao salvar eleitor: " + eleitorError.message, "err");
+        return null;
+      }
+
+      const {data:demanda,error:demandaError} = await db.from("demandas").insert([{
+        eleitor_id: eleitor.id,
+        tipo: tipoSelecionado,
+        tema: valor("tema"),
+        urgencia: valor("urgencia"),
+        relato: valor("relato"),
+        sugestao: valor("sugestao"),
+        deseja_apoiar: valor("apoio"),
+        deseja_voluntario: valor("voluntario"),
+        status: "nova"
+      }]).select().single();
+
+      if(demandaError){
+        setStatus("Erro ao salvar demanda: " + demandaError.message, "err");
+        return null;
+      }
+
+      if(arquivos.length){
+        await db.from("arquivos").insert(
+          arquivos.map(nome => ({
+            demanda_id: demanda.id,
+            nome_arquivo: nome,
+            link_arquivo: "arquivo informado no formulário"
+          }))
+        );
+      }
+
+      await capturarLocalizacao(eleitor.id);
+
+      setStatus("Manifestação salva com sucesso no banco de dados.", "ok");
+      return demanda;
+    }
+
+    function gerarResumo(){
+      return `*ELEITORON — NOVA MANIFESTAÇÃO POPULAR*
+
+*Tipo:* ${tipoSelecionado}
+*Tema:* ${valor("tema")}
+*Urgência:* ${valor("urgencia")}
+
+*Nome:* ${valor("nome")}
+*Telefone:* ${valor("telefone")}
+*Bairro:* ${valor("bairro")}
+*Cidade:* ${valor("cidade")}
+*Profissão:* ${valor("profissao")}
+
+*Relato:*
+${valor("relato")}
+
+*Sugestão:*
+${valor("sugestao")}
+
+*Deseja apoiar?* ${valor("apoio")}
+*Deseja ser voluntário?* ${valor("voluntario")}
+
+*Arquivos informados:*
+${arquivos.length ? arquivos.join("\\n") : "Nenhum arquivo informado."}
+
+*Localização:* ${document.getElementById("consentimentoLocalizacao").checked ? "autorizada pelo usuário" : "não autorizada"}
+
+*Banco de dados:* manifestação salva no EleitorON.
+
+Desenvolvido por Francis Jambeiro v1.0
+contato@francisjambeiro.com
+Direitos Autorais Reservados`;
+    }
+
+    async function salvarEEnviar(){
+      const btn = document.getElementById("btnEnviar");
+      btn.disabled = true;
+      btn.innerText = "SALVANDO...";
+
+      const demanda = await salvarNoBanco();
+
+      btn.disabled = false;
+      btn.innerText = "SALVAR NO BANCO E ENVIAR PELO WHATSAPP";
+
+      if(!demanda){
+        return;
+      }
+
+      window.open("https://wa.me/" + numeroWhatsApp + "?text=" + encodeURIComponent(gerarResumo()), "_blank");
+    }
+  </script>
 </body>
 </html>
