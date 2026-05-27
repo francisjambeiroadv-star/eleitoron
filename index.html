@@ -2,321 +2,423 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Triagem Jurídica Inteligente - Francis Jambeiro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EleitorON</title>
   <style>
+    :root {
+      --black: #050505;
+      --card: #0B0B0B;
+      --dark: #141414;
+      --green: #6CFF3B;
+      --glow: #39FF14;
+      --text: #FFFFFF;
+      --muted: #A0A0A0;
+      --border: #242424;
+    }
     * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
-      background: #050505;
-      color: #fff;
+      background: radial-gradient(circle at top, #141414 0%, #050505 40%, #000 100%);
+      color: var(--text);
     }
-    .container {
-      max-width: 1100px;
+    .layout {
+      max-width: 1500px;
       margin: auto;
-      padding: 28px;
+      padding: 22px;
+      display: grid;
+      grid-template-columns: 260px 1fr 340px;
+      gap: 18px;
     }
-    .header {
-      text-align: center;
-      margin-bottom: 28px;
+    .card, .sidebar, .rightbox, .hero, .option {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      box-shadow: 0 20px 50px rgba(0,0,0,.55);
     }
-    .header h1 {
-      margin: 0;
-      font-size: 36px;
+    .sidebar { padding: 22px; height: fit-content; }
+    .logo {
+      font-size: 34px;
+      font-weight: 900;
       letter-spacing: -1px;
     }
-    .header p {
-      color: #aaa;
-      margin-top: 8px;
+    .logo span { color: var(--green); text-shadow: 0 0 16px var(--glow); }
+    .tag { color: var(--muted); font-size: 12px; margin-top: 8px; line-height: 1.4; }
+    .nav { margin-top: 30px; display: grid; gap: 10px; }
+    .nav div {
+      padding: 13px;
+      border: 1px solid #1d1d1d;
+      border-radius: 14px;
+      color: white;
+      background: #090909;
     }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-      gap: 16px;
+    .nav div:first-child {
+      color: var(--green);
+      background: #101810;
+      border-color: #293c25;
     }
-    .card {
-      background: #111;
-      border: 1px solid #272727;
+    .mini {
+      margin-top: 30px;
+      background: #050505;
+      border: 1px solid var(--border);
       border-radius: 18px;
-      padding: 20px;
-      cursor: pointer;
-      transition: .2s;
+      padding: 18px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
     }
-    .card:hover { background: #1d1d1d; transform: translateY(-2px); }
-    .card h2 { margin: 0 0 8px; font-size: 21px; }
-    .card p { color: #bbb; font-size: 14px; line-height: 1.4; }
-    .panel {
-      background: #111;
-      border: 1px solid #272727;
-      border-radius: 22px;
-      padding: 24px;
-      box-shadow: 0 20px 60px rgba(0,0,0,.4);
+    .main { display: grid; gap: 18px; }
+    .hero {
+      padding: 34px;
+      position: relative;
+      overflow: hidden;
+      min-height: 275px;
     }
-    label {
-      display: block;
-      font-size: 13px;
-      color: #ccc;
-      margin-bottom: 6px;
+    .hero:after {
+      content: "ON";
+      position: absolute;
+      right: 30px;
+      top: 5px;
+      font-size: 180px;
+      font-weight: 900;
+      color: rgba(108,255,59,.09);
     }
-    input, textarea, select {
-      width: 100%;
-      background: #1b1b1b;
-      color: #fff;
+    .badge {
+      display: inline-block;
+      color: var(--green);
       border: 1px solid #333;
-      border-radius: 10px;
-      padding: 12px;
-      outline: none;
-      font-size: 15px;
+      background: black;
+      padding: 9px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      margin-bottom: 18px;
     }
-    textarea { min-height: 110px; resize: vertical; }
-    .field { margin-bottom: 14px; }
-    .row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 14px;
+    h1 {
+      font-size: 54px;
+      line-height: 1;
+      margin: 0;
+      letter-spacing: -2px;
     }
-    .buttons {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 12px;
-      margin-top: 20px;
+    h1 span {
+      color: var(--green);
+      text-shadow: 0 0 24px var(--glow);
     }
+    .hero p { color: #ddd; max-width: 650px; line-height: 1.5; }
     button {
       border: 0;
       border-radius: 14px;
-      padding: 15px;
-      font-size: 16px;
-      font-weight: bold;
+      padding: 14px 18px;
+      font-weight: 900;
       cursor: pointer;
+      background: var(--green);
+      color: #000;
+      box-shadow: 0 0 18px rgba(57,255,20,.24);
     }
-    .primary { background: #fff; color: #000; }
-    .secondary { background: #252525; color: #fff; border: 1px solid #444; }
-    .danger { background: #3a1111; color: #fff; border: 1px solid #6b2222; }
-    .hidden { display: none; }
-    .selected-area {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 22px;
-      border-bottom: 1px solid #2c2c2c;
-      padding-bottom: 16px;
+    button.secondary {
+      background: black;
+      color: white;
+      border: 1px solid var(--green);
+      box-shadow: none;
     }
-    .selected-area h2 { margin: 0; }
-    .small { color: #aaa; font-size: 13px; }
-    .footer {
+    .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 22px; }
+    .features {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .feature {
+      padding: 18px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+    }
+    .feature strong { color: white; }
+    .feature p { color: var(--muted); font-size: 13px; }
+    .icon { color: var(--green); font-size: 28px; }
+    .options {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .option {
+      padding: 22px;
+      cursor: pointer;
+      transition: .2s;
+    }
+    .option:hover {
+      border-color: var(--green);
+      transform: translateY(-2px);
+    }
+    .option h3 { margin: 10px 0; }
+    .option p { color: var(--muted); font-size: 14px; line-height: 1.4; }
+    .form {
+      padding: 24px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+    }
+    .row { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .formgrid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 13px;
+      margin-top: 18px;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 13px;
+      border-radius: 12px;
+      border: 1px solid #333;
+      background: var(--dark);
+      color: white;
+      font-size: 15px;
+    }
+    textarea { min-height: 115px; resize: vertical; margin-top: 13px; }
+    .upload {
+      margin-top: 14px;
+      padding: 22px;
       text-align: center;
-      color: #777;
-      margin-top: 24px;
-      font-size: 13px;
-    }
-    .notice {
-      background: #0b0b0b;
       border: 1px dashed #444;
-      padding: 14px;
-      border-radius: 14px;
-      color: #bbb;
+      border-radius: 18px;
+      background: black;
+    }
+    .full { width: 100%; margin-top: 14px; padding: 17px; }
+    .rightbox { padding: 22px; margin-bottom: 18px; }
+    .rightbox h2 {
+      color: var(--green);
+      margin-top: 0;
+      text-shadow: 0 0 12px rgba(57,255,20,.25);
+    }
+    .message {
+      background: #050505;
+      border: 1px solid #333;
+      border-radius: 18px;
+      padding: 16px;
+      color: #ddd;
+      font-size: 14px;
       line-height: 1.5;
-      margin-bottom: 18px;
+    }
+    .benefit {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin: 15px 0;
+      color: #ddd;
+      font-size: 14px;
+    }
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 14px var(--glow);
+      flex: none;
+    }
+    .hidden { display: none; }
+    .files { text-align: left; color: var(--muted); font-size: 13px; margin-top: 12px; }
+    @media (max-width: 1100px) {
+      .layout { grid-template-columns: 1fr; }
+      .features, .options, .formgrid { grid-template-columns: 1fr; }
+      h1 { font-size: 40px; }
+      .hero:after { display: none; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h1>Triagem Jurídica Inteligente</h1>
-      <p>Desenvolvido por Francis Jambeiro — versão 1.0</p>
-    </div>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="logo">ELEITOR<span>ON</span></div>
+      <div class="tag">A POPULAÇÃO ONLINE.<br>A POLÍTICA EM TEMPO REAL.</div>
+      <div class="nav">
+        <div>▦ Dashboard</div>
+        <div>☑ Demandas</div>
+        <div>◎ Mapa de Calor</div>
+        <div>▥ Relatórios</div>
+        <div>☏ Comunicações</div>
+        <div>◉ Voluntários</div>
+      </div>
+      <div class="mini">
+        <b>O ELEITOR<span style="color:var(--green)">ON</span></b><br><br>
+        Conecta o cidadão à estratégia política com dados, território e escuta popular.
+      </div>
+    </aside>
 
-    <div id="areaScreen" class="grid">
-      <div class="card" onclick="selecionarArea('Consumidor')">
-        <h2>Consumidor</h2>
-        <p>Cobranças indevidas, golpes, contratos, bancos, empresas, compras e serviços.</p>
-      </div>
-      <div class="card" onclick="selecionarArea('Família')">
-        <h2>Família</h2>
-        <p>Divórcio, alimentos, guarda, visitas, união estável e partilha de bens.</p>
-      </div>
-      <div class="card" onclick="selecionarArea('Funcionário Público / Administrativo')">
-        <h2>Funcionário Público</h2>
-        <p>PAD, sindicância, punições, perseguição funcional, remoção e direitos administrativos.</p>
-      </div>
-      <div class="card" onclick="selecionarArea('Criminal')">
-        <h2>Criminal</h2>
-        <p>Inquérito, flagrante, audiência, processo criminal, medidas cautelares e defesa.</p>
-      </div>
-      <div class="card" onclick="selecionarArea('Trabalhista')">
-        <h2>Trabalhista</h2>
-        <p>Vínculo, rescisão, verbas, dano moral, assédio e direitos trabalhistas.</p>
-      </div>
-    </div>
-
-    <div id="formScreen" class="panel hidden">
-      <div class="selected-area">
-        <div>
-          <span class="small">Área selecionada</span>
-          <h2 id="areaTitle"></h2>
+    <main class="main">
+      <section class="hero">
+        <div class="badge">● central de inteligência popular</div>
+        <h1>A CIDADE FALA.<br>O SISTEMA <span>ESCUTA.</span></h1>
+        <p>Transforme reclamações, denúncias, sugestões e pedidos da população em dados estratégicos para ação política.</p>
+        <div class="actions">
+          <button onclick="selecionarTipo('Reclamação do bairro')">FAZER UMA DEMANDA</button>
+          <button class="secondary" onclick="compartilharLista()">LISTA DE TRANSMISSÃO</button>
         </div>
-        <button class="secondary" onclick="trocarArea()">Trocar área</button>
-      </div>
+      </section>
 
-      <div class="notice">
-        Preencha as informações principais. Ao final, o sistema gera um resumo organizado e abre o WhatsApp para envio ao escritório.
-      </div>
+      <section class="features">
+        <div class="feature"><div class="icon">👥</div><strong>Participação Popular</strong><p>O cidadão informa e a campanha entende.</p></div>
+        <div class="feature"><div class="icon">📊</div><strong>Inteligência Territorial</strong><p>Dados por bairro, tema e urgência.</p></div>
+        <div class="feature"><div class="icon">🎯</div><strong>Decisão Estratégica</strong><p>Ação política orientada por realidade.</p></div>
+      </section>
 
-      <div class="row">
-        <div class="field"><label>Nome completo</label><input id="nome" /></div>
-        <div class="field"><label>Telefone / WhatsApp</label><input id="telefone" /></div>
-        <div class="field"><label>CPF</label><input id="cpf" /></div>
-        <div class="field"><label>E-mail</label><input id="email" /></div>
-      </div>
+      <section id="opcoes" class="options">
+        <div class="option" onclick="selecionarTipo('Denúncia')"><div class="icon">⚠</div><h3>Denúncia</h3><p>Irregularidade, abuso, abandono ou descaso público.</p></div>
+        <div class="option" onclick="selecionarTipo('Reclamação do bairro')"><div class="icon">📍</div><h3>Reclamação do bairro</h3><p>Rua, iluminação, saúde, transporte, segurança ou infraestrutura.</p></div>
+        <div class="option" onclick="selecionarTipo('Sugestão')"><div class="icon">💡</div><h3>Sugestão</h3><p>Ideia, proposta ou solução para melhorar a cidade.</p></div>
+        <div class="option" onclick="selecionarTipo('Apoio político')"><div class="icon">🤝</div><h3>Apoio político</h3><p>Declare apoio, indique pessoas ou manifeste adesão.</p></div>
+        <div class="option" onclick="selecionarTipo('Voluntariado')"><div class="icon">👥</div><h3>Voluntariado</h3><p>Ajude na mobilização, comunicação ou organização local.</p></div>
+      </section>
 
-      <div class="field">
-        <label>Grau de urgência</label>
+      <section id="formulario" class="form hidden">
+        <div class="row">
+          <div>
+            <div style="color:var(--muted)">Tipo de manifestação</div>
+            <h2 id="tipoEscolhido" style="color:var(--green)"></h2>
+          </div>
+          <button class="secondary" onclick="trocarTipo()">Trocar tipo</button>
+        </div>
+
+        <div class="formgrid">
+          <input id="nome" placeholder="Nome completo">
+          <input id="telefone" placeholder="WhatsApp">
+          <input id="bairro" placeholder="Bairro">
+          <input id="cidade" placeholder="Cidade">
+          <input id="profissao" placeholder="Profissão ou ocupação">
+          <select id="tema">
+            <option value="">Tema principal</option>
+            <option>Saúde</option><option>Educação</option><option>Segurança</option>
+            <option>Transporte</option><option>Infraestrutura</option>
+            <option>Iluminação pública</option><option>Emprego e renda</option>
+            <option>Funcionalismo público</option><option>Outro</option>
+          </select>
+        </div>
+
+        <br>
         <select id="urgencia">
-          <option value="">Selecione</option>
-          <option>Baixa</option>
-          <option>Média</option>
-          <option>Alta</option>
-          <option>Urgentíssima</option>
+          <option value="">Grau de urgência</option>
+          <option>Baixa</option><option>Média</option><option>Alta</option><option>Urgente</option>
         </select>
-      </div>
 
-      <div id="camposEspecificos"></div>
+        <textarea id="relato" placeholder="Descreva o problema, denúncia, reclamação ou situação do bairro."></textarea>
+        <textarea id="sugestao" placeholder="Qual solução você sugere?"></textarea>
 
-      <div class="field"><label>Relato dos fatos</label><textarea id="relato" placeholder="Descreva datas, locais, pessoas envolvidas, provas e o que aconteceu."></textarea></div>
-      <div class="row">
-        <div class="field"><label>Danos morais</label><textarea id="danosMorais" placeholder="Constrangimento, humilhação, exposição, sofrimento, prejuízo à imagem etc."></textarea></div>
-        <div class="field"><label>Danos materiais</label><textarea id="danosMateriais" placeholder="Despesas, valores pagos, prejuízos financeiros e perdas comprováveis."></textarea></div>
-      </div>
-      <div class="field"><label>Valor estimado do prejuízo material</label><input id="valorEstimado" placeholder="Ex: 2.500,00" /></div>
-      <div class="field"><label>Documentos anexados / disponíveis</label><input id="documentos" type="file" multiple /></div>
+        <div class="formgrid">
+          <select id="apoio"><option value="">Deseja apoiar o projeto?</option><option>Sim</option><option>Talvez</option><option>Não</option></select>
+          <select id="voluntario"><option value="">Deseja ser voluntário?</option><option>Sim</option><option>Talvez</option><option>Não</option></select>
+        </div>
 
-      <div class="buttons">
-        <button class="secondary" onclick="compartilharLinkSistema()">Compartilhar link do sistema</button>
-        <button class="primary" onclick="enviarResumoWhatsApp()">Enviar resumo pelo WhatsApp</button>
-        <button class="danger" onclick="limparFormulario()">Limpar formulário</button>
-      </div>
-    </div>
+        <div class="upload">
+          <p>Envie fotos, vídeos, prints ou documentos que comprovem a situação.</p>
+          <input id="arquivos" type="file" multiple onchange="listarArquivos()">
+          <div id="listaArquivos" class="files"></div>
+        </div>
 
-    <div class="footer">Francis Jambeiro — É seu direito conhecer DIREITO</div>
+        <button class="full" onclick="enviarEquipe()">ENVIAR PARA A EQUIPE PELO WHATSAPP</button>
+      </section>
+    </main>
+
+    <aside>
+      <section class="rightbox">
+        <h2>RECEBA POR LISTA DE TRANSMISSÃO</h2>
+        <p style="color:var(--muted)">Envie o link do formulário para sua lista e receba as respostas diretamente no WhatsApp.</p>
+        <div class="message">
+          <b style="color:var(--green)">MENSAGEM PRONTA</b><br><br>
+          ELEITORON — A cidade fala. O sistema escuta.<br><br>
+          Acesse o formulário e envie sua demanda.
+        </div>
+        <br>
+        <button class="full" onclick="compartilharLista()">GERAR MENSAGEM</button>
+      </section>
+
+      <section class="rightbox">
+        <h2>BENEFÍCIOS</h2>
+        <div class="benefit"><div class="dot"></div>Ouça mais pessoas</div>
+        <div class="benefit"><div class="dot"></div>Entenda o território</div>
+        <div class="benefit"><div class="dot"></div>Decida com inteligência</div>
+        <div class="benefit"><div class="dot"></div>Comunique melhor</div>
+        <div class="benefit"><div class="dot"></div>Transforme dados em ação</div>
+      </section>
+    </aside>
   </div>
 
   <script>
-    const WHATSAPP_ESCRITORIO = "5571983406868";
-    let areaSelecionada = "";
+    const numeroWhatsApp = "5571983406868";
+    const linkSistema = "https://SEU-LINK-AQUI.com";
+    let tipoSelecionado = "";
+    let arquivos = [];
 
-    function selecionarArea(area) {
-      areaSelecionada = area;
-      document.getElementById("areaScreen").classList.add("hidden");
-      document.getElementById("formScreen").classList.remove("hidden");
-      document.getElementById("areaTitle").innerText = area;
-      renderCamposEspecificos(area);
+    function selecionarTipo(tipo) {
+      tipoSelecionado = tipo;
+      document.getElementById("tipoEscolhido").innerText = tipo;
+      document.getElementById("opcoes").classList.add("hidden");
+      document.getElementById("formulario").classList.remove("hidden");
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
-    function trocarArea() {
-      areaSelecionada = "";
-      document.getElementById("formScreen").classList.add("hidden");
-      document.getElementById("areaScreen").classList.remove("hidden");
+    function trocarTipo() {
+      tipoSelecionado = "";
+      document.getElementById("formulario").classList.add("hidden");
+      document.getElementById("opcoes").classList.remove("hidden");
     }
 
-    function renderCamposEspecificos(area) {
-      const el = document.getElementById("camposEspecificos");
-      const campos = {
-        "Consumidor": `
-          <div class="row">
-            <div class="field"><label>Empresa, banco ou fornecedor</label><input id="empresa" /></div>
-            <div class="field"><label>Produto ou serviço envolvido</label><input id="produtoServico" /></div>
-            <div class="field"><label>Contrato, protocolo ou comprovante</label><input id="contrato" /></div>
-          </div>`,
-        "Família": `
-          <div class="row">
-            <div class="field"><label>Há filhos? Nome e idade</label><input id="filhos" /></div>
-            <div class="field"><label>Existe pensão/alimentos?</label><input id="alimentos" /></div>
-            <div class="field"><label>Existe discussão sobre guarda ou visitas?</label><input id="guarda" /></div>
-          </div>`,
-        "Funcionário Público / Administrativo": `
-          <div class="row">
-            <div class="field"><label>Órgão público ou instituição</label><input id="orgaoPublico" /></div>
-            <div class="field"><label>Cargo, função ou vínculo</label><input id="cargo" /></div>
-            <div class="field"><label>PAD, sindicância, punição, remoção ou ato administrativo</label><input id="atoAdministrativo" /></div>
-          </div>`,
-        "Criminal": `
-          <div class="row">
-            <div class="field"><label>Acusação ou fato investigado</label><input id="acusacao" /></div>
-            <div class="field"><label>Houve prisão, flagrante ou medida cautelar?</label><input id="prisao" /></div>
-            <div class="field"><label>Existe audiência marcada?</label><input id="audiencia" /></div>
-          </div>`,
-        "Trabalhista": `
-          <div class="row">
-            <div class="field"><label>Empresa ou empregador</label><input id="empregador" /></div>
-            <div class="field"><label>Período trabalhado</label><input id="periodoTrabalho" /></div>
-            <div class="field"><label>Verbas ou direitos discutidos</label><input id="verbas" /></div>
-          </div>`
-      };
-      el.innerHTML = campos[area] || "";
+    function listarArquivos() {
+      const input = document.getElementById("arquivos");
+      arquivos = Array.from(input.files).map(file => file.name);
+      document.getElementById("listaArquivos").innerHTML =
+        arquivos.length ? arquivos.map(a => "📎 " + a).join("<br>") : "";
     }
 
     function valor(id) {
-      const el = document.getElementById(id);
-      return el ? el.value : "";
+      return document.getElementById(id).value || "";
     }
 
-    function documentosSelecionados() {
-      const input = document.getElementById("documentos");
-      if (!input || !input.files || input.files.length === 0) return "Nenhum documento informado.";
-      return Array.from(input.files).map(f => "- " + f.name).join("\n");
+    function compartilharLista() {
+      const mensagem =
+`ELEITORON
+
+A cidade fala. O sistema escuta.
+
+Estamos ouvindo a população para construir propostas reais.
+
+Acesse o formulário e envie sua denúncia, reclamação, sugestão ou pedido:
+
+${linkSistema}
+
+Sua participação ajuda a mostrar os problemas que precisam ser enfrentados.
+
+Para não receber novas mensagens, responda SAIR.`;
+
+      window.open("https://wa.me/?text=" + encodeURIComponent(mensagem), "_blank");
     }
 
-    function gerarResumo() {
-      return `*NOVO ATENDIMENTO JURÍDICO*\n\n` +
-        `*Área:* ${areaSelecionada}\n\n` +
-        `*Nome:* ${valor("nome")}\n` +
-        `*Telefone:* ${valor("telefone")}\n` +
-        `*CPF:* ${valor("cpf")}\n` +
-        `*E-mail:* ${valor("email")}\n` +
-        `*Urgência:* ${valor("urgencia")}\n\n` +
-        `*Dados específicos:*\n` +
-        `Empresa/Fornecedor: ${valor("empresa")}\n` +
-        `Produto/Serviço: ${valor("produtoServico")}\n` +
-        `Contrato/Comprovante: ${valor("contrato")}\n` +
-        `Filhos: ${valor("filhos")}\n` +
-        `Alimentos: ${valor("alimentos")}\n` +
-        `Guarda/Visitas: ${valor("guarda")}\n` +
-        `Órgão público: ${valor("orgaoPublico")}\n` +
-        `Cargo/Função: ${valor("cargo")}\n` +
-        `Ato administrativo: ${valor("atoAdministrativo")}\n` +
-        `Acusação: ${valor("acusacao")}\n` +
-        `Prisão/Medida cautelar: ${valor("prisao")}\n` +
-        `Audiência: ${valor("audiencia")}\n` +
-        `Empregador: ${valor("empregador")}\n` +
-        `Período trabalhado: ${valor("periodoTrabalho")}\n` +
-        `Verbas discutidas: ${valor("verbas")}\n\n` +
-        `*Relato:*\n${valor("relato")}\n\n` +
-        `*Danos morais:*\n${valor("danosMorais")}\n\n` +
-        `*Danos materiais:*\n${valor("danosMateriais")}\n\n` +
-        `*Valor estimado:* R$ ${valor("valorEstimado")}\n\n` +
-        `*Documentos selecionados:*\n${documentosSelecionados()}\n\n` +
-        `*Observação:* os documentos devem ser conferidos antes da análise jurídica definitiva.`;
-    }
+    function enviarEquipe() {
+      const resumo =
+`*ELEITORON — NOVA MANIFESTAÇÃO POPULAR*
 
-    function enviarResumoWhatsApp() {
-      const texto = encodeURIComponent(gerarResumo());
-      window.open(`https://wa.me/${WHATSAPP_ESCRITORIO}?text=${texto}`, "_blank");
-    }
+*Tipo:* ${tipoSelecionado}
+*Tema:* ${valor("tema")}
+*Urgência:* ${valor("urgencia")}
 
-    function compartilharLinkSistema() {
-      const link = window.location.href;
-      const msg = encodeURIComponent(`Olá. Para iniciar sua análise jurídica, preencha o formulário abaixo com seus relatos, documentos e provas:\n\n${link}\n\n— Francis Jambeiro`);
-      window.open(`https://wa.me/?text=${msg}`, "_blank");
-    }
+*Nome:* ${valor("nome")}
+*Telefone:* ${valor("telefone")}
+*Bairro:* ${valor("bairro")}
+*Cidade:* ${valor("cidade")}
+*Profissão:* ${valor("profissao")}
 
-    function limparFormulario() {
-      document.querySelectorAll("input, textarea, select").forEach(el => {
-        if (el.type === "file") el.value = "";
-        else el.value = "";
-      });
+*Relato:*
+${valor("relato")}
+
+*Sugestão:*
+${valor("sugestao")}
+
+*Deseja apoiar?* ${valor("apoio")}
+*Deseja ser voluntário?* ${valor("voluntario")}
+
+*Arquivos informados:*
+${arquivos.length ? arquivos.join("\\n") : "Nenhum arquivo informado."}
+
+*Classificação interna:* avaliar bairro, tema dominante, urgência, força territorial e possibilidade de retorno.`;
+
+      window.open("https://wa.me/" + numeroWhatsApp + "?text=" + encodeURIComponent(resumo), "_blank");
     }
   </script>
 </body>
