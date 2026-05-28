@@ -1,696 +1,84 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EleitorON</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    :root{
-      --bg:#050505;
-      --card:#0B0B0B;
-      --field:#141414;
-      --green:#6CFF3B;
-      --glow:#39FF14;
-      --muted:#A0A0A0;
-      --border:#242424;
-      --red:#ff5b5b;
-    }
-
-    *{box-sizing:border-box}
-
-    body{
-      margin:0;
-      font-family:Arial,Helvetica,sans-serif;
-      background:radial-gradient(circle at top,#141414 0%,#050505 42%,#000 100%);
-      color:#fff;
-    }
-
-    .copyright{
-      text-align:center;
-      color:#777;
-      font-size:12px;
-      padding:14px 10px 0;
-    }
-
-    .layout{
-      max-width:1500px;
-      margin:auto;
-      padding:22px;
-      display:grid;
-      grid-template-columns:260px 1fr 340px;
-      gap:18px;
-    }
-
-    .sidebar,.hero,.card,.rightbox,.option,.form{
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:22px;
-      box-shadow:0 20px 50px rgba(0,0,0,.55);
-    }
-
-    .sidebar{
-      padding:22px;
-      height:fit-content;
-    }
-
-    .logo{
-      font-size:34px;
-      font-weight:900;
-      letter-spacing:-1px;
-    }
-
-    .logo span{
-      color:var(--green);
-      text-shadow:0 0 16px var(--glow);
-    }
-
-    .tag{
-      font-size:12px;
-      color:var(--muted);
-      margin-top:8px;
-      line-height:1.4;
-    }
-
-    .nav{
-      display:grid;
-      gap:10px;
-      margin-top:30px;
-    }
-
-    .nav div{
-      padding:13px;
-      border:1px solid #1d1d1d;
-      border-radius:14px;
-      background:#090909;
-    }
-
-    .nav div.active{
-      color:var(--green);
-      background:#101810;
-      border-color:#293c25;
-    }
-
-    .mini{
-      margin-top:30px;
-      border:1px solid var(--border);
-      background:#050505;
-      border-radius:18px;
-      padding:18px;
-      color:var(--muted);
-      font-size:14px;
-      line-height:1.45;
-    }
-
-    .main{
-      display:grid;
-      gap:18px;
-    }
-
-    .hero{
-      padding:34px;
-      position:relative;
-      overflow:hidden;
-      min-height:275px;
-    }
-
-    .hero:after{
-      content:"ON";
-      position:absolute;
-      right:28px;
-      top:5px;
-      font-size:180px;
-      font-weight:900;
-      color:rgba(108,255,59,.08);
-    }
-
-    .badge{
-      display:inline-block;
-      color:var(--green);
-      border:1px solid #333;
-      background:#000;
-      padding:9px 14px;
-      border-radius:999px;
-      font-size:13px;
-      margin-bottom:18px;
-    }
-
-    h1{
-      font-size:54px;
-      line-height:1;
-      margin:0;
-      letter-spacing:-2px;
-    }
-
-    h1 span{
-      color:var(--green);
-      text-shadow:0 0 24px var(--glow);
-    }
-
-    .hero p{
-      color:#ddd;
-      max-width:650px;
-      line-height:1.5;
-    }
-
-    .actions{
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-      margin-top:22px;
-    }
-
-    button{
-      border:0;
-      border-radius:14px;
-      padding:14px 18px;
-      font-weight:900;
-      cursor:pointer;
-      background:var(--green);
-      color:#000;
-      box-shadow:0 0 18px rgba(57,255,20,.24);
-    }
-
-    button.secondary{
-      background:#000;
-      color:#fff;
-      border:1px solid var(--green);
-      box-shadow:none;
-    }
-
-    button:disabled{
-      opacity:.55;
-      cursor:not-allowed;
-    }
-
-    .features,.options,.formgrid{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:14px;
-    }
-
-    .card,.option{
-      padding:20px;
-    }
-
-    .card p,.option p,.small{
-      color:var(--muted);
-      font-size:13px;
-      line-height:1.4;
-    }
-
-    .icon{
-      font-size:28px;
-      color:var(--green);
-    }
-
-    .option{
-      cursor:pointer;
-      transition:.2s;
-    }
-
-    .option:hover{
-      border-color:var(--green);
-      transform:translateY(-2px);
-    }
-
-    .form{
-      padding:24px;
-    }
-
-    .hidden{
-      display:none;
-    }
-
-    .row{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-
-    .formgrid{
-      grid-template-columns:repeat(2,1fr);
-      margin-top:18px;
-    }
-
-    input,textarea,select{
-      width:100%;
-      padding:13px;
-      border-radius:12px;
-      border:1px solid #333;
-      background:var(--field);
-      color:#fff;
-      font-size:15px;
-    }
-
-    textarea{
-      min-height:115px;
-      resize:vertical;
-      margin-top:13px;
-    }
-
-    .upload{
-      margin-top:14px;
-      padding:22px;
-      border:1px dashed #444;
-      border-radius:18px;
-      background:#000;
-      text-align:center;
-    }
-
-    .full{
-      width:100%;
-      margin-top:14px;
-      padding:17px;
-    }
-
-    .rightbox{
-      padding:22px;
-      margin-bottom:18px;
-    }
-
-    .rightbox h2{
-      color:var(--green);
-      margin-top:0;
-      text-shadow:0 0 12px rgba(57,255,20,.25);
-    }
-
-    .message{
-      background:#050505;
-      border:1px solid #333;
-      border-radius:18px;
-      padding:16px;
-      color:#ddd;
-      font-size:14px;
-      line-height:1.5;
-    }
-
-    .benefit{
-      display:flex;
-      gap:12px;
-      align-items:center;
-      margin:15px 0;
-      color:#ddd;
-      font-size:14px;
-    }
-
-    .dot{
-      width:12px;
-      height:12px;
-      border-radius:50%;
-      background:var(--green);
-      box-shadow:0 0 14px var(--glow);
-      flex:none;
-    }
-
-    .files{
-      text-align:left;
-      color:var(--muted);
-      font-size:13px;
-      margin-top:12px;
-    }
-
-    .ok{
-      color:var(--green);
-      font-weight:700;
-    }
-
-    .err{
-      color:var(--red);
-      font-weight:700;
-    }
-
-    label{
-      color:#ddd;
-      font-size:13px;
-      line-height:1.4;
-      display:flex;
-      gap:10px;
-      align-items:flex-start;
-      margin-top:14px;
-    }
-
-    label input{
-      width:auto;
-      margin-top:3px;
-    }
-
-    @media(max-width:1100px){
-      .layout{grid-template-columns:1fr}
-      .features,.options,.formgrid{grid-template-columns:1fr}
-      h1{font-size:40px}
-      .hero:after{display:none}
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EleitorON</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--card:rgba(11,11,11,.92);--field:#141414;--green:#6CFF3B;--glow:#39FF14;--muted:#b8b8b8;--border:#2a2a2a;--red:#ff5b5b}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;color:#fff;min-height:100vh;background:radial-gradient(circle at 20% 10%,rgba(108,255,59,.18),transparent 26%),radial-gradient(circle at 80% 0%,rgba(57,255,20,.10),transparent 28%),linear-gradient(180deg,#111 0%,#050505 45%,#000 100%);overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;background:linear-gradient(to top,rgba(0,0,0,.95) 0%,rgba(0,0,0,.62) 48%,rgba(0,0,0,.30) 100%),url("data:image/svg+xml,%3Csvg width='1400' height='900' viewBox='0 0 1400 900' xmlns='http://www.w3.org/2000/svg'%3E%3Cg opacity='.28' fill='%23fff'%3E%3Crect x='60' y='430' width='70' height='230'/%3E%3Crect x='150' y='360' width='95' height='300'/%3E%3Crect x='270' y='410' width='75' height='250'/%3E%3Crect x='370' y='320' width='120' height='340'/%3E%3Crect x='520' y='390' width='85' height='270'/%3E%3Crect x='630' y='350' width='105' height='310'/%3E%3Crect x='850' y='300' width='125' height='360'/%3E%3Crect x='1120' y='340' width='110' height='320'/%3E%3C/g%3E%3Cg opacity='.24' fill='%236CFF3B'%3E%3Ccircle cx='150' cy='720' r='24'/%3E%3Crect x='136' y='744' width='28' height='80' rx='10'/%3E%3Ccircle cx='235' cy='700' r='22'/%3E%3Crect x='222' y='722' width='26' height='88' rx='10'/%3E%3Ccircle cx='325' cy='725' r='25'/%3E%3Crect x='310' y='750' width='30' height='86' rx='10'/%3E%3Ccircle cx='1080' cy='705' r='25'/%3E%3Crect x='1065' y='730' width='30' height='85' rx='10'/%3E%3C/g%3E%3Cg opacity='.30' stroke='%236CFF3B' stroke-width='6' fill='none'%3E%3Cpath d='M250 650 L360 610 L360 680 Z'/%3E%3Cline x1='250' y1='650' x2='220' y2='720'/%3E%3Crect x='980' y='620' width='150' height='65' rx='8'/%3E%3Cline x1='1055' y1='685' x2='1055' y2='760'/%3E%3C/g%3E%3C/svg%3E");background-size:cover;background-position:center bottom;z-index:-2}
+body:after{content:"";position:fixed;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0,rgba(255,255,255,.025) 1px,transparent 1px,transparent 5px);z-index:-1}
+.page{max-width:960px;margin:0 auto;padding:22px 14px 42px}
+.top{text-align:center;padding:22px 8px}.logo{font-size:46px;font-weight:900;letter-spacing:-1px;margin:0;text-shadow:0 0 24px rgba(0,0,0,.8)}.logo span{color:var(--green);text-shadow:0 0 18px var(--glow)}
+.subtitle{color:#f0f0f0;font-size:18px;line-height:1.4;max-width:680px;margin:10px auto 0}.copyright{color:#b7b7b7;font-size:12px;text-align:center;margin-top:10px;line-height:1.4}
+.intro,.form,.choice{background:linear-gradient(145deg,rgba(11,11,11,.96),rgba(12,20,12,.90));border:1px solid rgba(108,255,59,.22);box-shadow:0 18px 55px rgba(0,0,0,.62),0 0 30px rgba(57,255,20,.06);backdrop-filter:blur(8px)}
+.intro{border-radius:24px;padding:24px;margin-bottom:18px}.intro h2{margin:0 0 8px;color:var(--green);font-size:24px}.intro p{color:#e5e5e5;line-height:1.5;margin:0;font-size:15px}
+.scene-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 18px}.scene-card{background:rgba(0,0,0,.66);border:1px solid rgba(255,255,255,.10);border-radius:18px;padding:12px;color:#ddd;font-size:13px;display:flex;gap:9px;align-items:center}.scene-card b{color:var(--green)}
+.choices{display:grid;gap:12px;margin-bottom:18px}.choice{width:100%;text-align:left;border-radius:20px;padding:18px;color:#fff;cursor:pointer;display:flex;gap:14px;align-items:flex-start;transition:.18s}.choice:hover{border-color:var(--green);transform:translateY(-1px)}
+.choice-icon{font-size:30px;min-width:38px}.choice-title{font-size:19px;font-weight:900;margin-bottom:4px}.choice-text{color:#c9c9c9;font-size:14px;line-height:1.35;font-weight:400}
+.form{display:none;border-radius:24px;padding:20px}.form.active{display:block}.form-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:16px}.form-head h2{color:var(--green);margin:0;font-size:24px}
+.back{background:#000;color:#fff;border:1px solid var(--green);box-shadow:none;padding:10px 12px;border-radius:12px;font-size:13px;font-weight:800;cursor:pointer}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+input,select,textarea{width:100%;padding:14px;border-radius:13px;border:1px solid #333;background:rgba(20,20,20,.98);color:#fff;font-size:16px;outline:none}input:focus,select:focus,textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(108,255,59,.12)}
+textarea{min-height:120px;resize:vertical;margin-top:12px}.full{grid-column:1/-1}.upload{margin-top:12px;padding:18px;border:1px dashed #555;border-radius:16px;background:#000;text-align:center;color:#ddd;font-size:14px}
+.files{text-align:left;color:var(--muted);margin-top:10px;font-size:13px}.consent{display:flex;gap:10px;align-items:flex-start;color:#ddd;font-size:13px;line-height:1.4;margin-top:14px}.consent input{width:auto;margin-top:2px}
+.send{margin-top:14px;width:100%;border:0;border-radius:16px;padding:16px;background:var(--green);color:#000;font-weight:900;font-size:16px;cursor:pointer;box-shadow:0 0 22px rgba(57,255,20,.24)}.send:disabled{opacity:.6;cursor:not-allowed}
+.status{text-align:center;font-size:14px;font-weight:800;min-height:20px;margin-top:12px}.ok{color:var(--green)}.err{color:var(--red)}.note{margin-top:18px;text-align:center;color:#cfcfcf;font-size:13px;line-height:1.4}
+@media(max-width:720px){.grid,.scene-strip{grid-template-columns:1fr}.logo{font-size:36px}.subtitle{font-size:15px}.form-head{align-items:flex-start;flex-direction:column}.back{width:100%}}
+</style>
 </head>
 <body>
-  <div class="copyright">
-    Desenvolvido por Francis Jambeiro v1.0 • contato@francisjambeiro.com • Direitos Autorais Reservados
-  </div>
+<main class="page">
+<section class="top">
+<h1 class="logo">ELEITOR<span>ON</span></h1>
+<p class="subtitle">A cidade fala. O sistema escuta.</p>
+<div class="copyright">Desenvolvido por Francis Jambeiro v1.0 • contato@francisjambeiro.com<br>Direitos Autorais Reservados</div>
+</section>
 
-  <div class="layout">
-    <aside class="sidebar">
-      <div class="logo">ELEITOR<span>ON</span></div>
-      <div class="tag">A POPULAÇÃO ONLINE.<br>A POLÍTICA EM TEMPO REAL.</div>
+<section id="inicio">
+<div class="intro"><h2>Participe da escuta popular</h2><p>Escolha abaixo como você quer participar. Sua informação será organizada para análise por bairro, tema e urgência.</p></div>
+<div class="scene-strip"><div class="scene-card">🏙️ <span><b>Cidade</b> em movimento</span></div><div class="scene-card">📢 <span><b>Voz popular</b> registrada</span></div><div class="scene-card">📍 <span><b>Bairro</b> ouvido</span></div></div>
+<div class="choices">
+<button class="choice" onclick="abrirFormulario('Denúncia')"><div class="choice-icon">⚠️</div><div><div class="choice-title">Fazer uma denúncia</div><div class="choice-text">Informe irregularidades, abandono, abuso, descaso ou problemas graves.</div></div></button>
+<button class="choice" onclick="abrirFormulario('Reclamação')"><div class="choice-icon">📍</div><div><div class="choice-title">Reclamar de um problema no bairro</div><div class="choice-text">Rua, iluminação, saúde, transporte, segurança, limpeza ou infraestrutura.</div></div></button>
+<button class="choice" onclick="abrirFormulario('Sugestão')"><div class="choice-icon">💡</div><div><div class="choice-title">Enviar uma sugestão</div><div class="choice-text">Apresente uma ideia, proposta ou solução para melhorar a cidade.</div></div></button>
+<button class="choice" onclick="abrirFormulario('Apoio político')"><div class="choice-icon">🤝</div><div><div class="choice-title">Declarar apoio</div><div class="choice-text">Informe seu apoio, indique pessoas ou diga como deseja participar.</div></div></button>
+<button class="choice" onclick="abrirFormulario('Voluntariado')"><div class="choice-icon">👥</div><div><div class="choice-title">Quero ser voluntário</div><div class="choice-text">Cadastre-se para ajudar na mobilização, comunicação ou organização.</div></div></button>
+</div></section>
 
-      <div class="nav">
-        <div>▦ Dashboard</div>
-        <div>☑ Demandas</div>
-        <div class="active">▣ Banco de Dados</div>
-        <div>◎ Mapa de Calor</div>
-        <div>▥ Relatórios</div>
-        <div>☏ Comunicações</div>
-      </div>
+<section id="formulario" class="form">
+<div class="form-head"><h2 id="tituloFormulario">Nova informação</h2><button class="back" onclick="voltarInicio()">Escolher outra opção</button></div>
+<div class="grid">
+<input id="nome" placeholder="Nome completo"><input id="telefone" placeholder="WhatsApp"><input id="bairro" placeholder="Bairro"><input id="cidade" placeholder="Cidade"><input id="profissao" placeholder="Profissão ou ocupação">
+<select id="tema"><option value="">Tema principal</option><option>Saúde</option><option>Educação</option><option>Segurança</option><option>Transporte</option><option>Infraestrutura</option><option>Iluminação pública</option><option>Emprego e renda</option><option>Funcionalismo público</option><option>Limpeza urbana</option><option>Outro</option></select>
+<select id="urgencia" class="full"><option value="">Grau de urgência</option><option>Baixa</option><option>Média</option><option>Alta</option><option>Urgente</option></select>
+</div>
+<textarea id="relato" placeholder="Descreva o que aconteceu ou o que precisa ser resolvido."></textarea>
+<textarea id="sugestao" placeholder="Que solução você sugere?"></textarea>
+<div class="grid" style="margin-top:12px;"><select id="apoio"><option value="">Deseja apoiar o projeto?</option><option>Sim</option><option>Talvez</option><option>Não</option></select><select id="voluntario"><option value="">Deseja ser voluntário?</option><option>Sim</option><option>Talvez</option><option>Não</option></select></div>
+<div class="upload">Envie fotos, vídeos, prints ou documentos, se houver.<br><br><input id="arquivos" type="file" multiple onchange="listarArquivos()"><div id="listaArquivos" class="files"></div></div>
+<label class="consent"><input id="consentimento" type="checkbox">Autorizo o armazenamento das informações enviadas para organização, análise, retorno de contato e gestão das manifestações populares.</label>
+<label class="consent"><input id="consentimentoLocalizacao" type="checkbox">Autorizo a captura aproximada da minha localização para fins de análise territorial.</label>
+<p id="status" class="status"></p><button id="btnEnviar" class="send" onclick="salvarEEnviar()">Enviar informação</button>
+</section>
+<p class="note">Para não receber novas mensagens, responda SAIR no WhatsApp.</p>
+</main>
 
-      <div class="mini">
-        <b>Banco Supabase</b><br><br>
-        Cada envio é salvo para análise territorial, histórico político, relatórios e mapas de calor.
-      </div>
-    </aside>
-
-    <main class="main">
-      <section class="hero">
-        <div class="badge">● central de inteligência popular</div>
-        <h1>A CIDADE FALA.<br>O SISTEMA <span>REGISTRA.</span></h1>
-        <p>Cada manifestação vira dado: bairro, tema, urgência, apoiador, voluntário, prioridade territorial e localização geográfica autorizada pelo usuário.</p>
-        <div class="actions">
-          <button onclick="selecionarTipo('Reclamação do bairro')">FAZER UMA DEMANDA</button>
-          <button class="secondary" onclick="compartilharLista()">LISTA DE TRANSMISSÃO</button>
-        </div>
-      </section>
-
-      <section class="features">
-        <div class="card">
-          <div class="icon">👤</div>
-          <h3>Cadastro de Eleitores</h3>
-          <p>Nome, bairro, cidade, contato e consentimento.</p>
-        </div>
-        <div class="card">
-          <div class="icon">🗄️</div>
-          <h3>Demandas Salvas</h3>
-          <p>Tipo, tema, urgência, relato, sugestão e status.</p>
-        </div>
-        <div class="card">
-          <div class="icon">📍</div>
-          <h3>Geolocalização</h3>
-          <p>Latitude e longitude para relatórios territoriais.</p>
-        </div>
-      </section>
-
-      <section id="opcoes" class="options">
-        <div class="option" onclick="selecionarTipo('Denúncia')">
-          <div class="icon">⚠</div>
-          <h3>Denúncia</h3>
-          <p>Irregularidade, abuso, abandono ou descaso público.</p>
-        </div>
-        <div class="option" onclick="selecionarTipo('Reclamação do bairro')">
-          <div class="icon">📍</div>
-          <h3>Reclamação do bairro</h3>
-          <p>Rua, iluminação, saúde, transporte, segurança ou infraestrutura.</p>
-        </div>
-        <div class="option" onclick="selecionarTipo('Sugestão')">
-          <div class="icon">💡</div>
-          <h3>Sugestão</h3>
-          <p>Ideia, proposta ou solução para melhorar a cidade.</p>
-        </div>
-        <div class="option" onclick="selecionarTipo('Apoio político')">
-          <div class="icon">🤝</div>
-          <h3>Apoio político</h3>
-          <p>Declare apoio, indique pessoas ou manifeste adesão.</p>
-        </div>
-        <div class="option" onclick="selecionarTipo('Voluntariado')">
-          <div class="icon">👥</div>
-          <h3>Voluntariado</h3>
-          <p>Ajude na mobilização, comunicação ou organização local.</p>
-        </div>
-      </section>
-
-      <section id="formulario" class="form hidden">
-        <div class="row">
-          <div>
-            <div class="small">Tipo de manifestação</div>
-            <h2 id="tipoEscolhido" style="color:var(--green)"></h2>
-          </div>
-          <button class="secondary" onclick="trocarTipo()">Trocar tipo</button>
-        </div>
-
-        <div class="formgrid">
-          <input id="nome" placeholder="Nome completo">
-          <input id="telefone" placeholder="WhatsApp">
-          <input id="bairro" placeholder="Bairro">
-          <input id="cidade" placeholder="Cidade">
-          <input id="profissao" placeholder="Profissão ou ocupação">
-          <select id="tema">
-            <option value="">Tema principal</option>
-            <option>Saúde</option>
-            <option>Educação</option>
-            <option>Segurança</option>
-            <option>Transporte</option>
-            <option>Infraestrutura</option>
-            <option>Iluminação pública</option>
-            <option>Emprego e renda</option>
-            <option>Funcionalismo público</option>
-            <option>Outro</option>
-          </select>
-        </div>
-
-        <br>
-
-        <select id="urgencia">
-          <option value="">Grau de urgência</option>
-          <option>Baixa</option>
-          <option>Média</option>
-          <option>Alta</option>
-          <option>Urgente</option>
-        </select>
-
-        <textarea id="relato" placeholder="Descreva o problema, denúncia, reclamação ou situação do bairro."></textarea>
-        <textarea id="sugestao" placeholder="Qual solução você sugere?"></textarea>
-
-        <div class="formgrid">
-          <select id="apoio">
-            <option value="">Deseja apoiar o projeto?</option>
-            <option>Sim</option>
-            <option>Talvez</option>
-            <option>Não</option>
-          </select>
-
-          <select id="voluntario">
-            <option value="">Deseja ser voluntário?</option>
-            <option>Sim</option>
-            <option>Talvez</option>
-            <option>Não</option>
-          </select>
-        </div>
-
-        <div class="upload">
-          <p>Envie fotos, vídeos, prints ou documentos que comprovem a situação.</p>
-          <input id="arquivos" type="file" multiple onchange="listarArquivos()">
-          <div id="listaArquivos" class="files"></div>
-        </div>
-
-        <label>
-          <input id="consentimento" type="checkbox">
-          Autorizo o armazenamento dos dados enviados para fins de organização, análise territorial, retorno de contato e gestão das manifestações populares.
-        </label>
-
-        <label>
-          <input id="consentimentoLocalizacao" type="checkbox">
-          Autorizo a captura da minha localização aproximada para fins de análise territorial e geração de relatórios por região.
-        </label>
-
-        <p id="status" class="small"></p>
-
-        <button id="btnEnviar" class="full" onclick="salvarEEnviar()">SALVAR NO BANCO E ENVIAR PELO WHATSAPP</button>
-      </section>
-    </main>
-
-    <aside>
-      <section class="rightbox">
-        <h2>BANCO DE DADOS</h2>
-        <div class="message">
-          Sistema conectado ao Supabase.<br><br>
-          Tabelas utilizadas:<br><br>
-          <b style="color:var(--green)">eleitores</b><br>
-          <b style="color:var(--green)">demandas</b><br>
-          <b style="color:var(--green)">arquivos</b><br>
-          <b style="color:var(--green)">localizacao_usuarios</b>
-        </div>
-      </section>
-
-      <section class="rightbox">
-        <h2>BENEFÍCIOS</h2>
-        <div class="benefit"><div class="dot"></div>Ouça mais pessoas</div>
-        <div class="benefit"><div class="dot"></div>Entenda o território</div>
-        <div class="benefit"><div class="dot"></div>Decida com inteligência</div>
-        <div class="benefit"><div class="dot"></div>Gere mapas e relatórios</div>
-        <div class="benefit"><div class="dot"></div>Transforme dados em ação</div>
-      </section>
-
-      <section class="rightbox">
-        <h2>LISTA DE TRANSMISSÃO</h2>
-        <p class="small">Gere a mensagem com o link do formulário para enviar no WhatsApp.</p>
-        <button class="full" onclick="compartilharLista()">GERAR MENSAGEM</button>
-      </section>
-    </aside>
-  </div>
-
-  <script>
-    const SUPABASE_URL = "https://casvnntqkozninmuazup.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhc3ZubnRxa296bmlubXVhenVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4ODk1NjYsImV4cCI6MjA5NTQ2NTU2Nn0.GdAdboPwO5fe6mU9gagWGSmrTt_ACB8HK0QPi6VnhLg";
-    const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    const numeroWhatsApp = "5571983406868";
-    const linkSistema = window.location.href;
-    let tipoSelecionado = "";
-    let arquivos = [];
-
-    function selecionarTipo(tipo){
-      tipoSelecionado = tipo;
-      document.getElementById("tipoEscolhido").innerText = tipo;
-      document.getElementById("opcoes").classList.add("hidden");
-      document.getElementById("formulario").classList.remove("hidden");
-      window.scrollTo({top:0,behavior:"smooth"});
-    }
-
-    function trocarTipo(){
-      tipoSelecionado = "";
-      document.getElementById("formulario").classList.add("hidden");
-      document.getElementById("opcoes").classList.remove("hidden");
-    }
-
-    function listarArquivos(){
-      const input = document.getElementById("arquivos");
-      arquivos = Array.from(input.files).map(file => file.name);
-      document.getElementById("listaArquivos").innerHTML = arquivos.length ? arquivos.map(a => "📎 " + a).join("<br>") : "";
-    }
-
-    function valor(id){
-      return document.getElementById(id).value || "";
-    }
-
-    function setStatus(texto,tipo="ok"){
-      const el = document.getElementById("status");
-      el.className = tipo === "ok" ? "ok" : "err";
-      el.innerText = texto;
-    }
-
-    function compartilharLista(){
-      const mensagem =
-`ELEITORON
-
-A cidade fala. O sistema escuta.
-
-Estamos ouvindo a população para construir propostas reais.
-
-Acesse o formulário e envie sua denúncia, reclamação, sugestão ou pedido:
-
-${linkSistema}
-
-Sua participação ajuda a mostrar os problemas que precisam ser enfrentados.
-
-Para não receber novas mensagens, responda SAIR.`;
-
-      window.open("https://wa.me/?text=" + encodeURIComponent(mensagem), "_blank");
-    }
-
-    async function capturarLocalizacao(eleitorId){
-      const permitido = document.getElementById("consentimentoLocalizacao").checked;
-
-      if(!permitido){
-        return;
-      }
-
-      if(!navigator.geolocation){
-        return;
-      }
-
-      navigator.geolocation.getCurrentPosition(
-        async (posicao) => {
-          try{
-            await db.from("localizacao_usuarios").insert([{
-              eleitor_id: eleitorId,
-              latitude: posicao.coords.latitude,
-              longitude: posicao.coords.longitude,
-              navegador: navigator.userAgent,
-              dispositivo: navigator.platform,
-              cidade: valor("cidade"),
-              bairro: valor("bairro")
-            }]);
-          }catch(e){
-            console.log("Erro ao salvar localização:", e.message);
-          }
-        },
-        (erro) => {
-          console.log("Localização não autorizada:", erro.message);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0
-        }
-      );
-    }
-
-    async function salvarNoBanco(){
-      const consentimento = document.getElementById("consentimento").checked;
-
-      if(!consentimento){
-        setStatus("É necessário autorizar o armazenamento dos dados para enviar.","err");
-        return null;
-      }
-
-      const {data:eleitor,error:eleitorError} = await db.from("eleitores").insert([{
-        nome: valor("nome"),
-        telefone: valor("telefone"),
-        bairro: valor("bairro"),
-        cidade: valor("cidade"),
-        profissao: valor("profissao"),
-        consentimento_lgpd: consentimento
-      }]).select().single();
-
-      if(eleitorError){
-        setStatus("Erro ao salvar eleitor: " + eleitorError.message, "err");
-        return null;
-      }
-
-      const {data:demanda,error:demandaError} = await db.from("demandas").insert([{
-        eleitor_id: eleitor.id,
-        tipo: tipoSelecionado,
-        tema: valor("tema"),
-        urgencia: valor("urgencia"),
-        relato: valor("relato"),
-        sugestao: valor("sugestao"),
-        deseja_apoiar: valor("apoio"),
-        deseja_voluntario: valor("voluntario"),
-        status: "nova"
-      }]).select().single();
-
-      if(demandaError){
-        setStatus("Erro ao salvar demanda: " + demandaError.message, "err");
-        return null;
-      }
-
-      if(arquivos.length){
-        await db.from("arquivos").insert(
-          arquivos.map(nome => ({
-            demanda_id: demanda.id,
-            nome_arquivo: nome,
-            link_arquivo: "arquivo informado no formulário"
-          }))
-        );
-      }
-
-      await capturarLocalizacao(eleitor.id);
-
-      setStatus("Manifestação salva com sucesso no banco de dados.", "ok");
-      return demanda;
-    }
-
-    function gerarResumo(){
-      return `*ELEITORON — NOVA MANIFESTAÇÃO POPULAR*
+<script>
+const SUPABASE_URL="https://casvnntqkozninmuazup.supabase.co";
+const SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhc3ZubnRxa296bmlubXVhenVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4ODk1NjYsImV4cCI6MjA5NTQ2NTU2Nn0.GdAdboPwO5fe6mU9gagWGSmrTt_ACB8HK0QPi6VnhLg";
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+const numeroWhatsApp="5571983406868";let tipoSelecionado="";let arquivos=[];
+function abrirFormulario(tipo){tipoSelecionado=tipo;const titulo=tipo==="Denúncia"?"Nova denúncia":tipo==="Reclamação"?"Nova reclamação":tipo==="Sugestão"?"Nova sugestão":tipo==="Voluntariado"?"Novo voluntário":"Novo apoio";document.getElementById("tituloFormulario").innerText=titulo;document.getElementById("inicio").style.display="none";document.getElementById("formulario").classList.add("active");window.scrollTo({top:0,behavior:"smooth"});}
+function voltarInicio(){document.getElementById("formulario").classList.remove("active");document.getElementById("inicio").style.display="block";window.scrollTo({top:0,behavior:"smooth"});}
+function listarArquivos(){const input=document.getElementById("arquivos");arquivos=Array.from(input.files).map(file=>file.name);document.getElementById("listaArquivos").innerHTML=arquivos.length?arquivos.map(a=>"📎 "+a).join("<br>"):"";}
+function valor(id){return document.getElementById(id).value||"";}
+function setStatus(texto,tipo="ok"){const el=document.getElementById("status");el.className=tipo==="ok"?"status ok":"status err";el.innerText=texto;}
+async function capturarLocalizacao(eleitorId){if(!document.getElementById("consentimentoLocalizacao").checked)return;if(!navigator.geolocation)return;navigator.geolocation.getCurrentPosition(async(posicao)=>{try{await db.from("localizacao_usuarios").insert([{eleitor_id:eleitorId,latitude:posicao.coords.latitude,longitude:posicao.coords.longitude,navegador:navigator.userAgent,dispositivo:navigator.platform,cidade:valor("cidade"),bairro:valor("bairro")}]);}catch(e){console.log("Erro localização:",e.message);}},(erro)=>console.log("Localização não autorizada:",erro.message),{enableHighAccuracy:true,timeout:10000,maximumAge:0});}
+async function salvarNoBanco(){if(!document.getElementById("consentimento").checked){setStatus("É necessário autorizar o armazenamento das informações.","err");return null;}const {data:eleitor,error:eleitorError}=await db.from("eleitores").insert([{nome:valor("nome"),telefone:valor("telefone"),bairro:valor("bairro"),cidade:valor("cidade"),profissao:valor("profissao"),consentimento_lgpd:true}]).select().single();if(eleitorError){setStatus("Erro ao salvar cadastro: "+eleitorError.message,"err");return null;}const {data:demanda,error:demandaError}=await db.from("demandas").insert([{eleitor_id:eleitor.id,tipo:tipoSelecionado,tema:valor("tema"),urgencia:valor("urgencia"),relato:valor("relato"),sugestao:valor("sugestao"),deseja_apoiar:valor("apoio"),deseja_voluntario:valor("voluntario"),status:"nova"}]).select().single();if(demandaError){setStatus("Erro ao salvar informação: "+demandaError.message,"err");return null;}if(arquivos.length){await db.from("arquivos").insert(arquivos.map(nome=>({demanda_id:demanda.id,nome_arquivo:nome,link_arquivo:"arquivo informado no formulário"})));}await capturarLocalizacao(eleitor.id);setStatus("Informação enviada com sucesso.","ok");return demanda;}
+function gerarResumo(){return `*ELEITORON — NOVA INFORMAÇÃO POPULAR*
 
 *Tipo:* ${tipoSelecionado}
 *Tema:* ${valor("tema")}
@@ -712,33 +100,14 @@ ${valor("sugestao")}
 *Deseja ser voluntário?* ${valor("voluntario")}
 
 *Arquivos informados:*
-${arquivos.length ? arquivos.join("\\n") : "Nenhum arquivo informado."}
+${arquivos.length ? arquivos.join("\n") : "Nenhum arquivo informado."}
 
 *Localização:* ${document.getElementById("consentimentoLocalizacao").checked ? "autorizada pelo usuário" : "não autorizada"}
 
-*Banco de dados:* manifestação salva no EleitorON.
-
 Desenvolvido por Francis Jambeiro v1.0
 contato@francisjambeiro.com
-Direitos Autorais Reservados`;
-    }
-
-    async function salvarEEnviar(){
-      const btn = document.getElementById("btnEnviar");
-      btn.disabled = true;
-      btn.innerText = "SALVANDO...";
-
-      const demanda = await salvarNoBanco();
-
-      btn.disabled = false;
-      btn.innerText = "SALVAR NO BANCO E ENVIAR PELO WHATSAPP";
-
-      if(!demanda){
-        return;
-      }
-
-      window.open("https://wa.me/" + numeroWhatsApp + "?text=" + encodeURIComponent(gerarResumo()), "_blank");
-    }
-  </script>
+Direitos Autorais Reservados`;}
+async function salvarEEnviar(){const btn=document.getElementById("btnEnviar");btn.disabled=true;btn.innerText="Enviando...";const resultado=await salvarNoBanco();btn.disabled=false;btn.innerText="Enviar informação";if(!resultado)return;window.open("https://wa.me/"+numeroWhatsApp+"?text="+encodeURIComponent(gerarResumo()),"_blank");}
+</script>
 </body>
 </html>
